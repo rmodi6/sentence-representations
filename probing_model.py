@@ -36,6 +36,7 @@ class ProbingClassifier(models.Model):
         # TODO(students): start
 
         self.classes_num = classes_num
+        # Create a simple Dense layer with no activations
         self.linear_layer = layers.Dense(classes_num)
 
         # TODO(students): end
@@ -58,9 +59,13 @@ class ProbingClassifier(models.Model):
         """
         # TODO(students): start
 
+        # Run the pre-trained model on the inputs
         outputs = self._pretrained_model(inputs)
+        # Extract the layer representations from the output dictionary
         logits, layer_representations = outputs['logits'], outputs['layer_representations']
+        # Extract the nth layer from the layer representations
         nth_layer = layer_representations[:, self._layer_num, :]
+        # Execute forward pass of the simple linear layer on the nth layer representation and get the logits
         logits = self.linear_layer(nth_layer)
 
         # TODO(students): end
