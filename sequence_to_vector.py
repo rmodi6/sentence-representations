@@ -90,8 +90,7 @@ class DanSequenceToVector(SequenceToVector):
              training=False) -> tf.Tensor:
         # TODO(students): start
 
-        batch_size = vector_sequence.shape[0]
-        max_tokens_num = vector_sequence.shape[1]
+        batch_size, max_tokens_num, embed_size = vector_sequence.shape
 
         sequence_mask = tf.reshape(sequence_mask, (batch_size, max_tokens_num, 1))
         num_words = tf.math.reduce_sum(sequence_mask, axis=1)
@@ -145,11 +144,9 @@ class GruSequenceToVector(SequenceToVector):
              training=False) -> tf.Tensor:
         # TODO(students): start
 
-        batch_size = vector_sequence.shape[0]
-        max_tokens_num = vector_sequence.shape[1]
+        batch_size, max_tokens_num, embed_size = vector_sequence.shape
 
         sequence_mask = tf.reshape(sequence_mask, (batch_size, max_tokens_num, 1))
-
         layer_representations = []
         for layer in self.gru_layers:
             vector_sequence, combined_vector = layer(vector_sequence, mask=sequence_mask)
