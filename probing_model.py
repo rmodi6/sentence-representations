@@ -64,7 +64,7 @@ class ProbingClassifier(models.Model):
         # Extract the layer representations from the output dictionary
         logits, layer_representations = outputs['logits'], outputs['layer_representations']
         # Extract the nth layer from the layer representations
-        nth_layer = layer_representations[:, self._layer_num, :]
+        nth_layer = layer_representations[:, self._layer_num - 1, :]
         # Execute forward pass of the simple linear layer on the nth layer representation and get the logits
         logits = self.linear_layer(nth_layer)
 
