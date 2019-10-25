@@ -77,7 +77,11 @@ class DanSequenceToVector(SequenceToVector):
     def __init__(self, input_dim: int, num_layers: int, dropout: float = 0.2):
         super(DanSequenceToVector, self).__init__(input_dim)
         # TODO(students): start
-        # ...
+
+        self.num_layers = num_layers
+        self.dropout_prob = dropout
+        self.dan_layers = [layers.Dense(self._input_dim, activation='relu') for i in range(self.num_layers)]
+
         # TODO(students): end
 
     def call(self,
@@ -85,7 +89,28 @@ class DanSequenceToVector(SequenceToVector):
              sequence_mask: tf.Tensor,
              training=False) -> tf.Tensor:
         # TODO(students): start
-        # ...
+
+        batch_size = vector_sequence.shape[0]
+        max_tokens_num = vector_sequence.shape[1]
+
+        sequence_mask = tf.reshape(sequence_mask, (batch_size, max_tokens_num, 1))
+        num_words = tf.math.reduce_sum(sequence_mask, axis=1)
+        vector_sequence = sequence_mask * vector_sequence
+        if training:
+            dropout_mask = tf.random.uniform(shape=(batch_size, max_tokens_num, 1)) >= self.dropout_prob
+            dropout_mask = tf.cast(dropout_mask, 'float32')
+            num_words = tf.math.reduce_sum(dropout_mask * sequence_mask, axis=1)
+            vector_sequence = dropout_mask * vector_sequence
+
+        combined_vector = tf.math.reduce_sum(vector_sequence, axis=1) / num_words
+
+        layer_representations = []
+        for layer in self.dan_layers:
+            combined_vector = layer(combined_vector)
+            layer_representations.append(combined_vector)
+
+        layer_representations = tf.stack(layer_representations, axis=1)
+
         # TODO(students): end
         return {"combined_vector": combined_vector,
                 "layer_representations": layer_representations}
