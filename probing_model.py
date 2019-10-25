@@ -59,8 +59,8 @@ class ProbingClassifier(models.Model):
         """
         # TODO(students): start
 
-        # Run the pre-trained model on the inputs
-        outputs = self._pretrained_model(inputs)
+        # Run the pre-trained model on the inputs; pass training value as False
+        outputs = self._pretrained_model(inputs, False)
         # Extract the layer representations from the output dictionary
         logits, layer_representations = outputs['logits'], outputs['layer_representations']
         # Extract the nth layer from the layer representations
