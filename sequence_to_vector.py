@@ -133,7 +133,10 @@ class GruSequenceToVector(SequenceToVector):
     def __init__(self, input_dim: int, num_layers: int):
         super(GruSequenceToVector, self).__init__(input_dim)
         # TODO(students): start
-        # ...
+
+        self.num_layers = num_layers
+        self.gru_layers = [layers.GRU(self._input_dim, return_sequences=True, return_state=True) for i in range(self.num_layers)]
+
         # TODO(students): end
 
     def call(self,
@@ -141,7 +144,20 @@ class GruSequenceToVector(SequenceToVector):
              sequence_mask: tf.Tensor,
              training=False) -> tf.Tensor:
         # TODO(students): start
-        # ...
+
+        batch_size = vector_sequence.shape[0]
+        max_tokens_num = vector_sequence.shape[1]
+
+        sequence_mask = tf.reshape(sequence_mask, (batch_size, max_tokens_num, 1))
+
+        layer_representations = []
+        for layer in self.gru_layers:
+            vector_sequence, combined_vector = layer(vector_sequence, mask=sequence_mask)
+            layer_representations.append(combined_vector)
+
+        combined_vector = layer_representations[-1]
+        layer_representations = tf.stack(layer_representations, axis=1)
+
         # TODO(students): end
         return {"combined_vector": combined_vector,
                 "layer_representations": layer_representations}
