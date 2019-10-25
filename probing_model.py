@@ -5,6 +5,7 @@ from tensorflow.keras import models, layers
 # project imports
 from util import load_pretrained_model
 
+
 class ProbingClassifier(models.Model):
     def __init__(self,
                  pretrained_model_path: str,
@@ -33,10 +34,13 @@ class ProbingClassifier(models.Model):
         self._layer_num = layer_num
 
         # TODO(students): start
-        # ...
+
+        self.classes_num = classes_num
+        self.linear_layer = layers.Dense(classes_num)
+
         # TODO(students): end
 
-    def call(self, inputs: tf.Tensor, training: bool =False) -> tf.Tensor:
+    def call(self, inputs: tf.Tensor, training: bool = False) -> tf.Tensor:
         """
         Forward pass of Probing Classifier.
 
@@ -53,6 +57,11 @@ class ProbingClassifier(models.Model):
             only be applied during training.
         """
         # TODO(students): start
-        # ...
+
+        outputs = self._pretrained_model(inputs)
+        logits, layer_representations = outputs['logits'], outputs['layer_representations']
+        nth_layer = layer_representations[:, self._layer_num, :]
+        logits = self.linear_layer(nth_layer)
+
         # TODO(students): end
         return {"logits": logits}
