@@ -112,7 +112,8 @@ class DanSequenceToVector(SequenceToVector):
             vector_sequence = dropout_mask * vector_sequence
 
         # Calculate the average vector using reduce sum and then dividing by number of actual tokens
-        combined_vector = tf.math.reduce_sum(vector_sequence, axis=1) / num_words
+        # Use divide_no_nan to avoid divide by zero error
+        combined_vector = tf.math.divide_no_nan(tf.math.reduce_sum(vector_sequence, axis=1), num_words)
 
         layer_representations = []
         for layer in self.dan_layers:  # For each layer in DAN
